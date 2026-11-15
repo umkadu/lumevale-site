@@ -1,6 +1,45 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
+<script>(function receberSaves() {
+  var m = /[#&]migrar=([01])\.([A-Za-z0-9_-]+)/.exec(location.hash);
+  if (!m) return;
+  window.LV_MIGRANDO = true;
+  document.documentElement.style.opacity = '0';
+  var ir = /[#&]ir=jogo\b/.test(location.hash) ? 'jogo/' : './';
+  var seguir = function () { location.replace(ir); };          // tira os saves do link e do histórico
+  var ler = function (k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+  var ocupado = function (n) { var s = ler('lumevale.slot.' + n); return !!(s && s.inicial); };
+  function gravar(d) {
+    var slots = Object.keys(d).filter(function (k) { return /^lumevale\.slot\.\d+$/.test(k); }).sort();
+    // configurações e preferências: só se este endereço ainda não tiver
+    Object.keys(d).forEach(function (k) {
+      if (!/^lumevale\./.test(k) || slots.indexOf(k) >= 0 || k === 'lumevale.retomar' || k === 'lumevale.migrado') return;
+      if (k === 'lumevale.save.v1' && slots.length) return;
+      if (localStorage.getItem(k) == null) localStorage.setItem(k, d[k]);
+    });
+    // saves: nunca apaga um save que já está aqui; se o espaço estiver ocupado, vai para um espaço vazio
+    slots.forEach(function (k) {
+      var s; try { s = JSON.parse(d[k]); } catch (e) { return; }
+      if (!s || !s.inicial) return;
+      var j;
+      for (j = 1; j <= 3; j++) if (localStorage.getItem('lumevale.slot.' + j) === d[k]) return;   // já veio antes
+      var n = +k.split('.')[2], dest = ocupado(n) ? 0 : n;
+      for (j = 1; !dest && j <= 3; j++) if (!ocupado(j)) dest = j;
+      if (dest) localStorage.setItem('lumevale.slot.' + dest, d[k]);
+    });
+  }
+  try {
+    var b = m[2].replace(/-/g, '+').replace(/_/g, '/');
+    while (b.length % 4) b += '=';
+    var bin = atob(b), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    var texto = m[1] === '1'
+      ? new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text()
+      : Promise.resolve(new TextDecoder().decode(bytes));
+    texto.then(function (json) { gravar(JSON.parse(json)); }).catch(function () { /* link quebrado: segue sem saves */ }).then(seguir);
+  } catch (e) { seguir(); }
+})()</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#06080c">
@@ -129,7 +168,7 @@
 
   var botao = document.getElementById('instalar'), pedido = null;
   var jaInstalado = window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: fullscreen)').matches || navigator.standalone;
-  if (jaInstalado) location.replace('jogo/');
+  if (jaInstalado && !window.LV_MIGRANDO) location.replace('jogo/');
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); pedido = e; botao.hidden = false; });
   botao.addEventListener('click', function () {
     if (!pedido) return;
