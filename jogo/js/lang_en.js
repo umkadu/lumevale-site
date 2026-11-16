@@ -1205,5 +1205,10 @@
     "lanternas": "lanterns",
     " min": " min",
     "Controle conectado: A pula, B ataca, X lanterna, R abre o Diário.": "Controller connected: A jumps, B attacks, X lantern, R opens the Diary.",
+    "Sua opinião": "Your feedback",
+    "Conte o que achou do jogo num formulário curto. A versão e até onde você chegou já vão preenchidas, sem o seu nome.": "Tell us what you think in a short form. The version and how far you got are filled in for you, without your name.",
+    "Dar opinião": "Give feedback",
+    "O jogo também conta acessos de forma anônima, sem cookies e sem guardar nada que identifique você, para saber quantas pessoas estão jogando.": "The game also counts visits anonymously, with no cookies and nothing that identifies you, to know how many people are playing.",
+    "Gostando do Lumevale? Conte o que achou em Configurações › Dar opinião.": "Enjoying Lumevale? Tell us what you think in Settings › Give feedback.",
   });
 })();

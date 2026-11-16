@@ -492,7 +492,7 @@
       game.pausado = false;
       ui.entrarNoJogo(false);
     } else if (volta && volta.slot && LV.carregarJogo(volta.slot)) {
-      if (volta.vista === 'atualizacao') ui.toast(LV.t('Lumevale atualizado para a versão ') + ui.VERSAO, 'bom');
+      if (volta.vista === 'atualizacao') ui.toast(LV.t('Lumevale atualizado para a versão ') + ui.VERSAO_TXT, 'bom');
       else ui.abrirConfig(true);
     } else {
       demo();

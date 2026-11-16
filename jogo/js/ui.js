@@ -26,8 +26,10 @@
     if (t && t.scrollIntoView) t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   };
   const som = (k) => { if (LV.audio) LV.audio.tocar(k); };
-  const VERSAO = '1.19.2';
+  const VERSAO = '0.9.0';
   ui.VERSAO = VERSAO;
+  const FASE = 'beta';   // aparece ao lado do número (v0.9.0 beta); deixe '' no lançamento da 1.0.0
+  ui.VERSAO_TXT = VERSAO + (FASE ? ' ' + FASE : '');
   let el = {};
 
   /* app instalado pelo site: versão nova baixada durante o jogo → aviso com botão (fica até tocar) */
@@ -2408,6 +2410,7 @@
         LV.t('<button class="btn" data-c="salvar">Salvar agora</button></div>') +
         LV.t('<p class="nota">Reiniciar mapa volta ao começo do mapa e renova os inimigos. Seu progresso continua salvo.</p></section>');
     }
+    h += secaoOpiniao();
     h += LV.t('<section class="sec"><header class="sec-h"><h2>Imagem</h2></header>') +
       LV.t('<label class="faixa" for="cfg-qualidade"><span>Resolução</span><select id="cfg-qualidade" data-cfgs="qualidade">') +
       '<option value="alta"' + (q === 'alta' ? LV.t(' selected') : '') + LV.t('>Alta (nítida)</option>') +
@@ -2432,8 +2435,16 @@
           : LV.t('<p class="nota">Controles: A/D andar · Espaço pular · W/S subir ou descer escadas e atravessar plataformas · clique para ir até um ponto · Esc abre esta janela.</p></section>'));
     }
     h += secaoLevarSave(emJogo);
-    h += LV.t('<div class="rodape-cfg"><span>Lumevale v') + VERSAO + '</span>' + (emJogo ? '<button class="segredo" data-m="console" title="Console do criador">· · ·</button>' : '') + '</div>';
+    h += LV.t('<div class="rodape-cfg"><span>Lumevale v') + ui.VERSAO_TXT + '</span>' + (emJogo ? '<button class="segredo" data-m="console" title="Console do criador">· · ·</button>' : '') + '</div>';
     return h;
+  }
+  /* formulário de opinião e aviso do contador anônimo (contador.js) */
+  function secaoOpiniao() {
+    if (!LV.darOpiniao) return '';
+    return '<section class="sec"><header class="sec-h"><h2>' + LV.t('Sua opinião') + '</h2></header>' +
+      '<p class="nota">' + LV.t('Conte o que achou do jogo num formulário curto. A versão e até onde você chegou já vão preenchidas, sem o seu nome.') + '</p>' +
+      '<div class="row"><button class="btn pri" data-c="opiniao">' + LV.t('Dar opinião') + '</button></div>' +
+      '<p class="nota">' + LV.t('O jogo também conta acessos de forma anônima, sem cookies e sem guardar nada que identifique você, para saber quantas pessoas estão jogando.') + '</p></section>';
   }
   /* levar o progresso para outro aparelho: no jogo gera o código; no menu inicial também importa */
   function secaoLevarSave(emJogo) {
@@ -2500,6 +2511,7 @@
     else if (c === 'telacheia') LV.telaCheia();
     else if (c === 'exportar') exportarSave(+b.dataset.n);
     else if (c === 'importar') importarSave();
+    else if (c === 'opiniao') { if (LV.darOpiniao) LV.darOpiniao(); }
     else if (c === 'auto') {
       if (game.acao.alternar('auto') === 'bloqueado') ui.toast(LV.t('A caçada automática desbloqueia a partir do mapa 2.'), 'ruim', true);
       b.setAttribute('aria-checked', String(S().op.auto)); hud();
@@ -2589,11 +2601,12 @@
         LV.t('<button class="btn-ini" data-i="novo">Novo jogo</button>') +
         '<button class="btn-ini" data-i="vcarregar"' + (algum ? '' : LV.t(' disabled')) + LV.t('>Carregar jogo</button>') +
         LV.t('<button class="btn-ini" data-i="opcoes">Opções</button></nav>') +
-        LV.t('<p class="muted small rodape-ini">Lumevale v') + VERSAO +
+        LV.t('<p class="muted small rodape-ini">Lumevale v') + ui.VERSAO_TXT +
         (function () {
           const outro = LV.idioma === 'pt' ? 'en' : 'pt';
           return '<button type="button" class="troca-idioma" data-i="idioma" data-id="' + outro + '" title="' + LV.t('Idioma') + '"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 8h13M8 1.5c-2.2 2.4-2.2 10.6 0 13M8 1.5c2.2 2.4 2.2 10.6 0 13" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>' + LV.IDIOMAS[outro] + '</button>';
-        })() + '</p>';
+        })() +
+        (LV.darOpiniao ? '<button type="button" class="troca-idioma" data-c="opiniao"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3h11v7.5h-6.2L4.5 13v-2.5h-2z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>' + LV.t('Dar opinião') + '</button>' : '') + '</p>';
     } else if (inicioVista === 'novo') {
       if (!novo.slot) novo.slot = LV.slots.primeiroVazio() || 1;
       const ocupado = LV.slots.resumo(novo.slot);
