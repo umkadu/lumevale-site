@@ -2378,11 +2378,13 @@
      mais altas). Só o que fica acima da cabeça (chapéu de cogumelo, crista, coroa) passa um pouco. A máscara fica
      no mesmo lugar e a lanterna onde ela aparece em cada desenho. */
   function poseHeroi(T, pose, capa) {
-    // v1.19: corpo padrão + capa por cima, no mesmo quadro: todas as capas com exatamente o mesmo corpo
+    // v1.19: corpo padrão e capa no mesmo quadro. v0.9.1: a imagem da capa é o desenho vestido inteiro (capa, rosto,
+    // mãos, cajado), então só ela é desenhada; o corpo por baixo deixava o contorno da cabeça aparecer nas frestas e
+    // nas bordas do capuz. O corpo só aparece enquanto a imagem da capa ainda está carregando.
     const C = LV.HEROI_CORPO, nc = 'heroi/corpo/' + pose;
     if (C && C.med[pose] && SPR().garantir(nc)) {
       const M = C.med[pose], h = T.h * C.alt[pose], w = M[6] * h, ic = LV.imgCapa(capa || 'padrao', pose);
-      const r = { nome: nc, camadas: SPR().garantir(ic) ? [ic] : [], h, w, M, dx: (0.5 - M[0]) * w };
+      const r = { nome: SPR().garantir(ic) ? ic : nc, camadas: [], h, w, M, dx: (0.5 - M[0]) * w };
       r.lx = (r.dx + (M[3] - 0.5) * w) * T.face;
       r.ly = -(1 - M[4]) * h;
       return r;

@@ -26,7 +26,7 @@
     if (t && t.scrollIntoView) t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   };
   const som = (k) => { if (LV.audio) LV.audio.tocar(k); };
-  const VERSAO = '0.9.0';
+  const VERSAO = '0.9.1';
   ui.VERSAO = VERSAO;
   const FASE = 'beta';   // aparece ao lado do número (v0.9.0 beta); deixe '' no lançamento da 1.0.0
   ui.VERSAO_TXT = VERSAO + (FASE ? ' ' + FASE : '');
